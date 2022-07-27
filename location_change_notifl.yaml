@@ -9,8 +9,8 @@ blueprint:
       selector:
         entity:
           domain: person
-    device_tracker:
-      name: Deivce
+    person_device_tracker:
+      name: Deivce tracker
       selector:
         entity:
           domain: device_tracker
