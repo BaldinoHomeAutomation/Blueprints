@@ -1,1 +1,48 @@
+blueprint:
+  name: Location Change Notification
+  description: A Simple Location Change Notification for location Tracking
+  domain: automation
+  source_url: https://github.com/BaldinoHomeAutomation/Blueprints/blob/main/location_change_notifl.yaml
+  input:
+    person_entity:
+      name: Person
+      selector:
+        entity:
+          domain: person
+    device_tracker:
+      name: Deivce
+        selector:
+          entity:
+            domain: device_tracker
+    zone_entity:
+      name: Zone
+        selector:
+          entity:
+            domain: zone
+    notify_device:
+      name: Device to notify
+      description: Device Requires Home Assisatnt App
+      selector:
+        device:
+          intergration: mobile_app
 
+trigger:
+  platform: state
+entity_id: !input person_entity
+
+variables:
+  zone_entity: !input zone_entity
+  zone_state: "{{ states[zone_entity].name }}"
+  person_entity: !input person_entity
+  person_name: "{{ states[person_entity].name }}"
+
+  condition:
+    condition: template
+    value_template: "{{ zone_entity == 'zone.home" and trigger.from_state.state == 'home' and trigger.to_state.state != 'home' or trigger.from_state.state == zone_state and trigger.to_state.state != zone_state }}"
+
+action:
+  - alias: "Notify that a person has left the zone"
+    domain: mobile_app
+    type: notify
+    device_id: !input notify_device
+    message: "{{ person_name }} has left {{ zone_state }}"
